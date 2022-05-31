@@ -3,7 +3,6 @@
 #include <string.h>
 #include <LiquidCrystal.h>
 
-
 ///======VARIABLES======//
 
 //variables for lcd init
@@ -19,6 +18,25 @@ const int down = 7;
 //buzzer
 const int buzzer = 6;
 
+//distinct frequencies to be played by buzzer
+const double D4_freq = 293.66;
+const double F4_freq = 349.23;
+const double G4_freq = 392.00;
+const double A4_freq = 440.00;
+const double A4s_freq = 466.16;
+const double B4_freq = 493.88;
+const double C5_freq = 523.25;
+const double C5s_freq = 554;
+const double D5_freq = 587.33;
+const double E5_freq = 659.00;
+const double F5_freq = 698.46;
+const double F5s_freq = 740;
+const double G5_freq = 783.99;
+const double G5s_freq = 831.00;
+const double A5_freq = 880.00;
+const double B5_freq = 988.00;
+const double off = 0;
+
 //to keep track of button presses 
 int rightPress = 0;
 int upPress = 0;
@@ -31,21 +49,23 @@ int phraseSize = 0;
 char letter = ""; 
 
 //Array of function names
-const int FSIZE = 4;
-String funcNames[FSIZE] = {"Breathing", "Exercise", "Motivational", "Phrases"};
+const int FSIZE = 8;
+String funcNames[FSIZE] = {"Breathing", "Exercise", "Motivational", "Phrases", "Song", "Melodies", "Arcade", "Game"};
 int choice = 0;
+
+//Array of song names
+const int SSIZE = 3;
+char songs[SSIZE][50] = {"Merry Go Round of Life", "Take On Me", "Rick Roll"};
+int songsSize = 0;
+int melodySizes[3] = {17, 32, 29}; 
+double melody1[17] = {D4_freq, G4_freq, A4s_freq, D5_freq, D5_freq, C5_freq, A4s_freq, A4_freq, A4s_freq, G4_freq, A4s_freq, D5_freq, G5_freq, G5_freq, A5_freq, A4s_freq, F5_freq};
+double melody2[32] = {F5s_freq, F5s_freq,D5_freq, B4_freq, off, B4_freq, off, E5_freq, off, E5_freq, off, E5_freq, G5s_freq, G5s_freq, A5_freq, B5_freq, A5_freq, A5_freq, A5_freq, E5_freq, off, D5_freq, off, F5s_freq, off, F5s_freq, off, F5s_freq, E5_freq, E5_freq, F5s_freq, E5_freq};
+double melody3[29] = {A4_freq, B4_freq, D5_freq, B4_freq, F5s_freq, F5s_freq, E5_freq, A4_freq, B4_freq, D5_freq, B4_freq, E5_freq, E5_freq, D5_freq, C5s_freq, B4_freq, A4_freq, B4_freq, D5_freq, B4_freq, D5_freq, E5_freq, C5s_freq, B4_freq, A4_freq, A4_freq, A4_freq, E5_freq, D5_freq};
 
 //Indexes to traverse arrays
 int PhraseIndex = 0;
 int MenuIndex = 0;
-
-
-//distinct frequencies to be played by buzzer
-const double F4_freq = 349.23;
-const double G4_freq = 392.00;
-const double A4_freq = 440.00;
-const double B4_freq = 493.88;
-const double C5_freq = 523.25;
+int SongIndex = 0;
 
 //======END VARIABLES======//
 
@@ -54,42 +74,16 @@ const double C5_freq = 523.25;
 
 //This state function executes the breathing
 //exercise option
-enum Breathe_states { Breathe_init, Breathe_waitPress, Breathe_waitRelease, Breathe_inhale, Breathe_hold, Breathe_exhale} Breathe_state;
+enum Breathe_states { Breathe_init, Breathe_inhale, Breathe_hold, Breathe_exhale} Breathe_state;
 void TickFct_Breathe(){
   switch(Breathe_state) { // Transitions
   
      case Breathe_init:// Initial transition
-//        Breathe_state = Breathe_waitPress;
         Breathe_state = Breathe_inhale;
         lc.clearDisplay(0);
         lcd.clear();
-//        lcd.print("Breathing");
-//        lcd.setCursor(0, 1);
-//        lcd.print("Exercise");
         break;
         
-     case Breathe_waitPress: // - wait for user to press button
-        if (digitalRead(right) == LOW ){
-          Breathe_state = Breathe_waitPress;  
-        }
-        else if (digitalRead(right) == HIGH){
-          Breathe_state = Breathe_waitRelease; 
-        }
-        else{
-          Breathe_state = Breathe_waitPress;
-        }
-        break;
-        
-     case Breathe_waitRelease: //wait for user to release button
-        if (digitalRead(right) == HIGH){
-          Breathe_state = Breathe_waitRelease;  
-        }
-        else{
-          Breathe_state = Breathe_inhale;
-          lcd.clear();
-        }
-        break;
-
      case Breathe_inhale:
         Breathe_state = Breathe_hold; 
         break;
@@ -207,7 +201,7 @@ void TickFct_Breathe(){
 }
 
 //This function executes the motivational phrases option
-enum Phrase_states { Phrase_init, Phrase_waitPress, Phrase_waitRelease, Phrase_display, Phrase_waitPress2, Phrase_waitRelease2, Phrase_next, Phrase_previous} Phrase_state;
+enum Phrase_states { Phrase_init, Phrase_display, Phrase_waitPress2, Phrase_waitRelease2, Phrase_next, Phrase_previous} Phrase_state;
 void TickFct_Phrases(){
   switch(Phrase_state) { // Transitions
   
@@ -217,35 +211,9 @@ void TickFct_Phrases(){
         lc.setIntensity(0, 3);
         happyFace();
         lcd.clear();
-//        lcd.setCursor(0,0);
-//        lcd.print("Motivational");
-//        lcd.setCursor(0, 1);
-//        lcd.print("Phrases");
         PhraseIndex = 0;
         break;
         
-     case Phrase_waitPress: // - wait for user to press button
-        if (digitalRead(right) == LOW ){
-          Phrase_state = Phrase_waitPress;  
-        }
-        else if (digitalRead(right) == HIGH){
-          Phrase_state = Phrase_waitRelease; 
-        }
-        else{
-          Phrase_state = Phrase_waitPress;
-        }
-        break;
-        
-     case Phrase_waitRelease: //wait for user to release button
-        if (digitalRead(right) == HIGH){
-          Phrase_state = Phrase_waitRelease;  
-        }
-        else{
-          Phrase_state = Phrase_display;
-          lcd.clear();
-        }
-        break;
-
      case Phrase_display:
         Phrase_state = Phrase_waitPress2;
         break;
@@ -337,6 +305,143 @@ void TickFct_Phrases(){
         else{
           PhraseIndex = 0;  
         }
+        break;
+        
+     default:
+        break;
+  } //state actions
+}
+
+enum Song_states { Song_init, Song_display, Song_waitPress, Song_waitRelease, Song_next, Song_previous, Song_play} Song_state;
+void TickFct_Songs(){
+  switch(Song_state) { // Transitions
+  
+     case Song_init:// Initial transition
+        Song_state = Song_display;
+        lc.clearDisplay(0);
+        lcd.clear();
+        SongIndex = 0;
+        break;
+        
+     case Song_display:
+        Song_state = Song_waitPress;
+        break;
+
+     case Song_waitPress:
+        if(digitalRead(right) == HIGH){
+          rightPress = 1;
+          Song_state = Song_waitRelease; 
+        }
+        else if (digitalRead(up) == HIGH){
+          upPress = 1;
+          Song_state = Song_waitRelease; 
+        }
+        else if (digitalRead(down) == HIGH){
+          downPress = 1;
+          Song_state = Song_waitRelease; 
+        }
+        else{
+          Song_state = Song_waitPress;
+        }
+        break;
+
+     case Song_waitRelease:
+        if (digitalRead(right) == HIGH || digitalRead(down) == HIGH || digitalRead(up) == HIGH){
+          Song_state = Song_waitRelease;  
+        }
+        else{
+          if (upPress){
+            Song_state = Song_next; 
+            upPress = 0; 
+          }
+          else if (downPress){
+            Song_state = Song_previous; 
+            downPress = 0; 
+          }
+          else if (rightPress){
+            Song_state = Song_play; 
+            rightPress = 0; 
+          }
+          else{
+            Song_state = Song_waitPress;  
+          }  
+        }
+        break;
+
+     case Song_next:
+        Song_state = Song_display;
+        lcd.clear();
+        break;
+
+     case Song_previous:
+        Song_state = Song_display;
+        lcd.clear();
+        break;
+
+     case Song_play:
+        Song_state = Song_init;
+        break;
+        
+     default:
+        Song_state = Song_init;
+        break;
+   } // Transitions
+
+  switch(Song_state) { // state actions  
+
+     case Song_display:
+          lcd.setCursor(16, 0);
+          lcd.autoscroll();
+          songsSize = strlen(songs[SongIndex]);
+          for (int i = 0; i < songsSize; i++) {
+            letter = *(*(songs + SongIndex) + i);
+            lcd.print(letter);
+            delay(200);
+          }
+          lcd.noAutoscroll();
+        break;
+
+     case Song_next:
+        if (SongIndex < SSIZE - 1){
+          SongIndex++;  
+        }
+        else{
+          SongIndex = SSIZE - 1;  
+        }
+        break;
+
+     case Song_previous:
+        if (SongIndex > 0){
+          SongIndex--;  
+        }
+        else{
+          SongIndex = 0;  
+        }
+        break;
+
+     case Song_play:
+        if (SongIndex == 0){
+          for (int i = 0; i < melodySizes[SongIndex]; i++){
+          tone(buzzer, melody1[i]);
+          delay(600);
+          noTone(buzzer); 
+          }
+        }
+        else if (SongIndex == 1){
+          for (int i = 0; i < melodySizes[SongIndex]; i++){
+          tone(buzzer, melody2[i]);
+          delay(215);
+          noTone(buzzer); 
+          }  
+        }
+        else if (SongIndex == 2){
+          for (int i = 0; i < melodySizes[SongIndex]; i++){
+          tone(buzzer, melody3[i]);
+          delay(265);
+          noTone(buzzer); 
+          }
+        }
+        choice = 0;
         break;
         
      default:
@@ -455,6 +560,12 @@ void TickFct_Menu(){
         else if (MenuIndex == 2 || MenuIndex == 3){
           choice = 2;  
         }
+        else if (MenuIndex == 4 || MenuIndex == 5){
+          choice = 3;  
+        }
+        else if (MenuIndex == 6 || MenuIndex == 7){
+          choice = 4;  
+        }
         else{
           choice = 0;  
         }
@@ -494,6 +605,7 @@ void setup() {
   Breathe_state = Breathe_init;
   Phrase_state = Phrase_init;
   Menu_state = Menu_init;
+  Song_state = Song_init;
 }
 //======END SETUP======//
 
@@ -507,6 +619,12 @@ void loop() {
   }
   else if (choice == 2){
     TickFct_Phrases();  
+  }
+  else if (choice == 3){
+    TickFct_Songs();  
+  }
+  else if (choice == 4){
+    choice = 0;  
   }
   else{
     choice = 0;  
