@@ -67,8 +67,83 @@ int PhraseIndex = 0;
 int MenuIndex = 0;
 int SongIndex = 0;
 
+//Variables for Game:
+//initial position
+int initCol = 0; 
+int initRow = 3;
+
+//current position
+int currCol = initCol;
+int currRow = initRow;
+
+//final position 
+int finalCol = 7;
+int finalRow = 4;
+
+//check if specific led is lit up
+int litUp = 0;
+
+//determine if level has been won
+bool levelWon = 0;
+
+//initial level
+int initLevel = 1;
+
+//keep track of current level
+int currLevel = initLevel;
+
+//possible moves
+const int moveUp = 1;
+const int moveRight = 1;
+const int moveDown = 1;
+
+//flags for seeing which move to do 
+bool goUp = 0;
+bool goRight = 0;
+bool goDown = 0;
+
+//determine if game is over
+bool gameOver = 0;
+
+//keep track of lives
+int lives = 3;
+
+//total number of lives
+int maxLives = 3;
+
+//flags to see if wrong/correct move was made
+bool wrongMove = 0;
+bool validMove = 0;
+
+//used to determine when to toggle exit LED
+int loops = 5;
+
+//used to blink exit LED
+int toggle = 1;
+
+
 //======END VARIABLES======//
 
+
+//======HELPER FUNCTIONS======//
+
+//  Function to display player in specified row and column
+//  Also blinks the exit
+void player(int row, int col){
+    loops--;
+    if (loops <= 0){
+      toggle = !toggle;
+      lc.setLed(0, finalRow, finalCol, toggle);
+      loops = 5;
+        
+    }
+    lc.setLed(0, row, col, 1);
+    delay(100);
+    lc.setLed(0, row,col, 0);
+    delay(100);
+}
+
+//======HELPER FUNCTIONS END======//
 
 //======STATE MACHINE FUNCTIONS======//
 
@@ -450,6 +525,156 @@ void TickFct_Songs(){
 }
 
 
+
+//This state machine will wait for and capture user input on the buttons
+//and then move the LED on the maze accordingly, restarting if wall was hit or went out of bounds
+enum ButtonMove_BM_states { Button_waitPress, Button_waitRelease, Button_check} BM_state;
+void TickFct_ButtonMove(){
+  switch(BM_state) { // Transitions
+        
+     case Button_waitPress: // Initial transition - wait for user to press button
+        if ((digitalRead(right) == LOW) && (digitalRead(up) == LOW) && (digitalRead(down) == LOW) ){
+          BM_state = Button_waitPress;  
+        }
+        else if ((digitalRead(right) == HIGH)){
+          goRight = 1;
+          BM_state = Button_waitRelease; 
+        }
+        else if ((digitalRead(up) == HIGH)){
+          goUp = 1;
+          BM_state = Button_waitRelease;  
+        }
+        else if ((digitalRead(down) == HIGH)){
+          goDown = 1;
+          BM_state = Button_waitRelease;  
+        }
+        else{
+          BM_state = Button_waitPress;
+        }
+        break;
+        
+     case Button_waitRelease: //wait for user to release button
+        if (goUp){
+          if (digitalRead(up) == HIGH){
+            BM_state = Button_waitRelease;  
+          }
+          else{
+            BM_state = Button_check;
+          }
+        }
+        else if (goRight){
+          if (digitalRead(right) == HIGH){
+            BM_state = Button_waitRelease;  
+          }
+          else{
+            BM_state = Button_check; 
+          }
+        }
+        else if (goDown){
+          if (digitalRead(down) == HIGH){
+            BM_state = Button_waitRelease;  
+          }
+          else{
+            BM_state = Button_check;
+          }
+        }
+        else{
+            BM_state = Button_waitPress;
+        }
+        break;
+
+     case Button_check: 
+        BM_state = Button_waitPress;
+        
+     default:
+        BM_state = Button_waitPress;
+   } // Transitions
+
+  switch(BM_state) { // state actions
+     case Button_check: //check which button was pressed and respond accordingly
+        if (goUp){
+          //litUp is 1 if the LED you're trying to move to is on
+          litUp = lc.getLed(currRow - moveUp, currCol);
+          //if the LED is on or if it is out of bounds, 
+          //move player to starting position and mark a wrong move
+          if (litUp || ((currRow - moveUp) < 0)){
+            currCol = initCol;
+            currRow = initRow;
+            wrongMove = 1;
+            
+          }
+          //otherwise move player to specified spot and mark a valid move
+          else{
+            currCol = currCol;
+            currRow = currRow - moveUp;
+            validMove = 1;  
+          }
+          goUp = 0; //reset flag
+        }
+        else if (goRight){
+          litUp = lc.getLed(currRow, currCol + moveRight);
+          if (litUp || ((currCol + moveRight) > 7)){
+            currCol = initCol;
+            currRow = initRow;
+            wrongMove = 1;
+          }
+          else{
+            currCol += moveRight;
+            currRow = currRow;  
+            validMove = 1;
+          } 
+          goRight = 0;
+        } 
+        else if (goDown){
+          litUp = lc.getLed(currRow + moveDown, currCol);
+          if (litUp || ((currRow + moveDown) > 7)){
+            currCol = initCol;
+            currRow = initRow;
+            wrongMove = 1;
+          }
+          else{
+            currCol = currCol;
+            currRow += moveDown;
+            validMove = 1;  
+          }
+          goDown = 0;
+        }    
+
+        if (wrongMove){ //take a life and play tune to indicate invalid move
+          wrongMove = 0;
+          lives--;
+          tone(buzzer, F5_freq);
+          delay(100);
+          tone(buzzer, G5_freq);
+          delay(100);
+          noTone(buzzer);  
+        }
+
+        if (validMove){ //play a tune when valid move is made
+          validMove = 0;
+          tone(buzzer, F5_freq); 
+          delay(50);
+          noTone(buzzer); 
+        }
+
+        //check if user has lost all lives and restart game if so
+        if (lives <= 0){
+           gameOver = 1;
+           delay(500);          
+        }
+            
+        //check if the player has reached the exit, and if so set the levelWon flag
+        //and return player to starting positon
+        if ((currRow == finalRow) && (currCol == finalCol)){
+          levelWon = 1; 
+        }
+        break;
+     default:
+        break;
+  } //state actions
+}
+
+
 //This function acts as a menu for the user
 //displaying choices and setting a variable based on what was chosen
 enum Menu_states { Menu_init, Menu_display, Menu_waitPress, Menu_waitRelease, Menu_previous, Menu_next, Menu_set} Menu_state;
@@ -606,6 +831,7 @@ void setup() {
   Phrase_state = Phrase_init;
   Menu_state = Menu_init;
   Song_state = Song_init;
+  BM_state = Button_waitPress;
 }
 //======END SETUP======//
 
@@ -624,7 +850,22 @@ void loop() {
     TickFct_Songs();  
   }
   else if (choice == 4){
-    choice = 0;  
+    if (!levelWon && !gameOver){
+      //as long as level isn't won, call ButtonMove function and adjust position  
+      levels(currLevel);
+      TickFct_ButtonMove();
+      player(currRow, currCol);  
+    }
+    else{
+      //if game is lost, update variables to restart and display losing message
+      gameOver = 0;
+      lives = 3;
+      currLevel = initLevel;
+      currRow = initRow;
+      currCol = initCol;
+      levelWon = 0;
+      choice = 0;
+    }
   }
   else{
     choice = 0;  
