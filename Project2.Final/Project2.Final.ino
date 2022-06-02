@@ -16,7 +16,7 @@
  *  I acknowledge all content contained herein, excluding template, provided code, or example
  *  code, is my own original work.
  *  
- *  Demo Link: <>
+ *  Demo Link: <https://www.youtube.com/watch?v=dzWFiDtVErs&t=25s>
  *  GitHub Repo: <https://github.com/Zorten/StressReliever>
  */
 
@@ -96,14 +96,14 @@ int choice = 0; //this variable will be used to check if the user selected a fun
 
 //Array of song names and variables to traverse/operate
 const int SSIZE = 3;
-char songs[SSIZE][50] = {"Merry Go Round of Life", "Take On Me", "Rick Roll"};
+char songs[SSIZE][50] = {"Take On Me", "Rick Roll", "Merry Go Round of Life"};
 int songsSize = 0;
 
 //Arrays with note frequencies for each melody 
-int melodySizes[3] = {17, 32, 29}; 
-double melody1[17] = {D4_freq, G4_freq, A4s_freq, D5_freq, D5_freq, C5_freq, A4s_freq, A4_freq, A4s_freq, G4_freq, A4s_freq, D5_freq, G5_freq, G5_freq, A5_freq, A4s_freq, F5_freq};
-double melody2[32] = {F5s_freq, F5s_freq,D5_freq, B4_freq, off, B4_freq, off, E5_freq, off, E5_freq, off, E5_freq, G5s_freq, G5s_freq, A5_freq, B5_freq, A5_freq, A5_freq, A5_freq, E5_freq, off, D5_freq, off, F5s_freq, off, F5s_freq, off, F5s_freq, E5_freq, E5_freq, F5s_freq, E5_freq};
-double melody3[29] = {A4_freq, B4_freq, D5_freq, B4_freq, F5s_freq, F5s_freq, E5_freq, A4_freq, B4_freq, D5_freq, B4_freq, E5_freq, E5_freq, D5_freq, C5s_freq, B4_freq, A4_freq, B4_freq, D5_freq, B4_freq, D5_freq, E5_freq, C5s_freq, B4_freq, A4_freq, A4_freq, A4_freq, E5_freq, D5_freq};
+int melodySizes[3] = {32, 29, 17}; 
+double melody1[32] = {F5s_freq, F5s_freq,D5_freq, B4_freq, off, B4_freq, off, E5_freq, off, E5_freq, off, E5_freq, G5s_freq, G5s_freq, A5_freq, B5_freq, A5_freq, A5_freq, A5_freq, E5_freq, off, D5_freq, off, F5s_freq, off, F5s_freq, off, F5s_freq, E5_freq, E5_freq, F5s_freq, E5_freq};
+double melody2[29] = {A4_freq, B4_freq, D5_freq, B4_freq, F5s_freq, F5s_freq, E5_freq, A4_freq, B4_freq, D5_freq, B4_freq, E5_freq, E5_freq, D5_freq, C5s_freq, B4_freq, A4_freq, B4_freq, D5_freq, B4_freq, D5_freq, E5_freq, C5s_freq, B4_freq, A4_freq, A4_freq, A4_freq, E5_freq, D5_freq};
+double melody3[17] = {D4_freq, G4_freq, A4s_freq, D5_freq, D5_freq, C5_freq, A4s_freq, A4_freq, A4s_freq, G4_freq, A4s_freq, D5_freq, G5_freq, G5_freq, A5_freq, A4s_freq, F5_freq};
 
 //Array of difficulties
 const int DSIZE = 3;
@@ -564,25 +564,25 @@ void TickFct_Songs(){
         lcd.noDisplay();
         if (SongIndex == 0){
           for (int i = 0; i < melodySizes[SongIndex]; i++){
-          tone(buzzer, melody1[i]);
-          delay(550);
-          noTone(buzzer); 
+            tone(buzzer, melody1[i]);
+            delay(215);
+            noTone(buzzer); 
           }
         }
         else if (SongIndex == 1){
           for (int i = 0; i < melodySizes[SongIndex]; i++){
-          tone(buzzer, melody2[i]);
-          delay(215);
-          noTone(buzzer); 
+            tone(buzzer, melody2[i]);
+            delay(250);
+            tone(buzzer, off);
+            delay(50);
+            noTone(buzzer);  
           }  
         }
         else if (SongIndex == 2){
           for (int i = 0; i < melodySizes[SongIndex]; i++){
-          tone(buzzer, melody3[i]);
-          delay(250);
-          tone(buzzer, off);
-          delay(50);
-          noTone(buzzer); 
+            tone(buzzer, melody3[i]);
+            delay(550);
+            noTone(buzzer);
           }
         }
         lcd.display();
@@ -1218,6 +1218,7 @@ void loop() {
             currRow = initRow;
             currCol = initCol;
             currLevel = initLevel;
+            diffChoice = 0;
             lives = 3;
             choice = 0;
           }

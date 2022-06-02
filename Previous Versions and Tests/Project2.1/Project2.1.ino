@@ -819,9 +819,9 @@ void setup() {
   lc.clearDisplay(0);
 
   // Set Buttons as INPUT
-  pinMode(up, INPUT);
-  pinMode(right, INPUT);
-  pinMode(down, INPUT);
+  pinMode(up, INPUT_PULLUP);
+  pinMode(right, INPUT_PULLUP);
+  pinMode(down, INPUT_PULLUP);
 
   // Set buzzer as output
   pinMode(buzzer, OUTPUT);
@@ -834,6 +834,8 @@ void setup() {
   BM_state = Button_waitPress;
 }
 //======END SETUP======//
+
+//======LOOP======//
 
 void loop() {
   // put your main code here, to run repeatedly:
@@ -871,3 +873,4 @@ void loop() {
     choice = 0;  
   }
 }
+//======END LOOP======//
