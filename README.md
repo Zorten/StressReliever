@@ -1,5 +1,5 @@
 # StressReliever
-
+Interactive project meant to distract from and relieve stress.
 #### Video Demo
 https://www.youtube.com/watch?v=dzWFiDtVErs&t=25s
 
