@@ -1,4 +1,8 @@
 # StressReliever
+
+#### Video Demo
+https://www.youtube.com/watch?v=dzWFiDtVErs&t=25s
+
 ## Purpose
 Welcome to Stress Reliever! This is an interactive project whose purpose is to relieve anxiety and stress by engaging you and distracting you from your worries, even if just for a second. I was inspired to do this project because of the loved ones around me who get overtaken by anxiety, and also because of my continuously high levels of stress. With this project, I hope to alleviate these overwhelming feelings.
 This version of Stress Reliever comes with 4 main functions:
@@ -62,3 +66,5 @@ Lastly, the Arcade Game function allows you to play a game I created for my past
   For this project, most of my testing involved the LCD, since I had not used it before. I had to experiment with how much power to give to the LCD to properly light up the screen while also powering the LED Matrix. I had to test how to display text in different parts of the display, how to move it, how to make it scroll, and how to display special custom characters, like the arrows. 
 Besides this, I had little need for testing because of my incremental development approach to this project. I designed and implemented each of the main functions independently from each other, making sure that one was fully functional before moving on to the next. Most of the bugs I encountered were resolved by: revising and fixing code logic or state machine design, doing some rewiring, or using the Arduino Serial() function to output to the console and observe code behavior. 
 
+## Challenges & Lessons Learned
+I think that my biggest challenge in this project was to put all my different functions together into one, and to adapt all of them to work with the simple setup that I have. Thus, from this project I learned that it is important to have clean, maintainable code to facilitate implementation and to reduce unnecessary work.
