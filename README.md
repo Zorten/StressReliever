@@ -21,5 +21,9 @@ Any one of these can be selected and played around with. The Breathing Exercise 
 
 ## LED Matrix Circuit Schematic
 
+![image](./images/matrix.diagram.png)
+
 ## Circuit Schematic for Remaining Components
+
+![image](./images/circuit.diagram.png)
 
