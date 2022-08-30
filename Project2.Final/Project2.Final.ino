@@ -722,8 +722,9 @@ void TickFct_Difficulty(){
 }
 
 
-//This state machine will wait for and capture user input on the buttons
-//and then move the LED on the maze accordingly, restarting if wall was hit or went out of bounds
+//This state machine is for the arcade game input.
+//It will wait for and capture user input on the buttons
+//and then move the LED on the maze accordingly, restarting if wall was hit or player went out of bounds
 enum ButtonMove_BM_states { Button_waitPress, Button_waitRelease, Button_check} BM_state;
 void TickFct_ButtonMove(){
   switch(BM_state) { // Transitions
@@ -1001,7 +1002,7 @@ void TickFct_Menu(){
 }
 
 //This function displays a little animation and plays
-//a tune to indicate level was passed.
+//a tune to indicate a level was passed.
 //Only one state since animation needs to play at once.
 enum LevelWon_States { LW_celebration } LW_state;
 void TickFct_LevelWon(){
@@ -1040,7 +1041,7 @@ void TickFct_LevelWon(){
   } // BM_state actions
 }
 
-//This function shows a message telling the user they won and plays a tune
+//This function shows a message telling the user they won the game and plays a tune
 enum GameWon_States { GW_celebration } GW_state;
 void TickFct_GameWon(){
   switch(GW_state) { // Transitions
@@ -1240,7 +1241,7 @@ void loop() {
       lcd.display();
     }
   }
-  else{
+  else{ //if for any reason choice is a different value, just set it to display menu
       choice = 0;  
     }
 }
