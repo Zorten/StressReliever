@@ -1,7 +1,7 @@
 # StressReliever
 
 #### Video Demo
-[![Watch my video](images/video.png)](https://www.youtube.com/watch?v=dzWFiDtVErs&t=25s)
+[![Watch my video](images/video1.png)](https://www.youtube.com/watch?v=dzWFiDtVErs&t=25s)
 
 ## Purpose
 Welcome to Stress Reliever! This is an interactive project whose purpose is to relieve anxiety and stress by engaging you and distracting you from your worries, even if just for a second. I was inspired to do this project because of the loved ones around me who get overtaken by anxiety, and also because of my continuously high levels of stress. With this project, I hope to alleviate these overwhelming feelings.
